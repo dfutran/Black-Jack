@@ -1,0 +1,402 @@
+import javax.swing.*;
+
+import java.awt.*;
+import java.awt.event.*;
+//import java.io.*;
+import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+
+
+public class BJGUI extends JFrame implements ActionListener{
+	
+	Deck deck; 
+	//adding these
+	Panel menuCenter = new Panel();
+	Panel buttons1 = new Panel(); 
+	Panel buttons2 = new Panel();
+	Panel betting = new Panel();
+	Panel betbuttons = new Panel();
+	Panel thisIsMyScore = new Panel();
+	Panel instruct = new Panel();
+	
+	private Player player =new Player();
+	private Player dealer = new Player(); 
+	
+	Button start = new Button("Start");
+	Button exit = new Button("Exit");
+	Button hit = new Button("Hit");
+	Button stay = new Button("Stay");
+	Button restart = new Button("Next Round"); 
+	Button split = new Button("Split"); 
+	Button doubledown = new Button("Double Down"); 
+	Button inst = new Button("Instructions"); 
+	
+	private int myScore=0;
+	private int myBet=1;
+	private int round=0;
+	
+	private boolean hasSplit = false; 
+	private boolean afterFirstHand = false; 
+
+	private TextArea User = new TextArea("Player's Hand:\n"); //Player's Text Area
+	private TextArea Computer = new TextArea("Dealer's Hand\n"); //Dealer's Text Area
+	//im adding these:
+	private TextField score = new TextField(10); // we got to keep track of score lol
+	private JLabel howMuch = new JLabel("How much?");
+	private TextField bet = new TextField(3);//players should be able to bet
+	private JLabel showScore = new JLabel("Score: "+myScore);
+	
+	 public BJGUI(){
+	      setTitle("BJ Game");
+		  setSize(500,300);
+		  setLayout(new FlowLayout());	
+		  setVisible(true);
+		  setDefaultCloseOperation(EXIT_ON_CLOSE);
+		  setLocation(500,300);
+		  
+		  //hit, stay, play again, exit buttons 
+		  instruct.setLayout(new FlowLayout(FlowLayout.CENTER)); 
+		  buttons1.setLayout(new FlowLayout(FlowLayout.CENTER));
+		  buttons2.setLayout(new FlowLayout(FlowLayout.CENTER));
+		  betting.setLayout(new FlowLayout(FlowLayout.CENTER));
+		  thisIsMyScore.setLayout(new FlowLayout(FlowLayout.CENTER));
+		  thisIsMyScore.add(showScore);
+		  instruct.add(inst);
+		  buttons1.add(hit);
+	      buttons1.add(stay);
+	      buttons1.add(split); 
+	      buttons1.add(doubledown);
+	      betting.add(howMuch);
+	      betting.add(bet); 
+	      buttons2.add(restart); 
+		  buttons2.add(start); 
+	      buttons2.add(exit);
+	      betting.add(showScore);
+	      //betting.add(score);
+
+	      betbuttons.setLayout(new BorderLayout());
+		  betbuttons.add(betting, BorderLayout.NORTH);
+		  betbuttons.add(thisIsMyScore, BorderLayout.SOUTH);
+		  
+	      //im adding this:
+	      menuCenter.setLayout(new GridLayout(4,1));
+	      menuCenter.add(instruct); 
+	      menuCenter.add(buttons1);
+	      menuCenter.add(betbuttons);
+	      menuCenter.add(buttons2);
+		  
+		  Container myContentPane = getContentPane();
+		  
+		  User.setPreferredSize(new Dimension( 200, 300 ));
+		  Computer.setPreferredSize(new Dimension(200, 300));
+		  myContentPane.add(User); 
+		  myContentPane.add(menuCenter);
+		  myContentPane.add(Computer); 
+		  
+		
+		  
+		  start.addActionListener(this);
+		  start.setEnabled(true);
+		  exit.addActionListener(this);
+		  exit.setEnabled(true);
+		  hit.addActionListener(this);
+		  hit.setEnabled(false);
+		  stay.addActionListener(this);
+		  stay.setEnabled(false);
+		  restart.addActionListener(this);
+		  restart.setEnabled(false); 
+		  split.addActionListener(this); 
+		  split.setEnabled(false);
+		  doubledown.addActionListener(this);
+		  doubledown.setEnabled(false);
+		  inst.addActionListener(this);
+		  inst.setEnabled(true); 
+		  
+		
+		  
+		  pack(); 
+
+	 }
+	 
+	 private void first_deal(Player player) { //dealing a card in beginning
+	        player.dealTo(deck.deal());
+	    }
+	 
+	 private void hit_user(Player player) { //card gained for user from hit 
+		 player.dealTo(deck.deal()); 
+		 User.append(player.hitCard());
+	 }
+	 
+	 private void hit_dealer(Player player) { //card gained for dealer
+		 player.dealTo(deck.deal()); 
+		 Computer.append(player.hitCard()); 
+	 }
+	 
+	 private void hit_split1(Player player) {
+		 player.dealToSplit1(deck.deal());
+		 User.append(player.hitCardSplit1()); 
+	 }
+	 
+	 private void hit_split2(Player player) {
+		 player.dealToSplit2(deck.deal());
+		 User.append(player.hitCardSplit2());
+	 }
+	 
+	 
+	 private void split_player () {
+		 player.split_Hand();
+		 User.append("\n" + "Split!!!" + "\n");
+		 User.append("\n" + "Hand 1: " + "\n" + player.first_card() + "\n"); 
+		 hit_split1(player); 
+	 }
+	 
+	 private void second_hand () {
+		 afterFirstHand = true; 
+		 User.append("\n" + "Hand 2: " + "\n" + player.second_card() + "\n"); 
+		 //hit_split2(player); 
+	 }
+	 
+	
+	 
+		
+	// deal out two cards each and adds text to TextArea
+	 private void deal() {
+		 player.reset(); 
+		 dealer.reset(); 
+		 deck = new Deck();
+		 deck.shuffle();
+		 first_deal(player);
+	     first_deal(dealer);
+	     first_deal(player);
+	     first_deal(dealer);
+	     User.append(player.toString()); 
+	     Computer.append(dealer.toString());
+	  
+	     
+	     
+	 }
+	 
+	 public void clearboard() { //clears board for new game
+		 User.setText("");
+		 Computer.setText(""); 
+	 }
+		 
+	 
+	 private void checkWinner() { //says who wins and loses
+	        if 		(player.value() >  21)              {User.append("You bust\nYou Lose "+myBet+"\n");
+        												Computer.append("You bust\nYou Lose "+myBet+"\n");
+	        											myScore-=myBet;
+	        											showScore.setText("Score: "+myScore);}
+	        else if (dealer.value()  >  21)             {User.append("Dealer busts\nYou Win "+myBet+"\n");
+														Computer.append("Dealer busts\nYou Win "+myBet+"\n");
+	        											myScore+=myBet;
+	        											showScore.setText("Score: "+myScore);}
+	        else if (player.value() == dealer.value())  {User.append("Push\nNothing lost or won\n");
+														Computer.append("Push\nNothing lost or won\n");}
+	        else if (player.value() >  dealer.value())  {User.append("You Have the higher value\nYou Win "+myBet+"\n");
+														Computer.append("You Have the higher value\nYou Win "+myBet+"\n");
+	        											myScore+=myBet;
+	        											showScore.setText("Score: "+myScore);}
+	        else {User.append("Dealer has the higher value\nYou Lose "+myBet+"\n");
+					Computer.append("Dealer has the higher value\nYou Lose "+myBet+"\n");	
+					myScore-=myBet;
+					showScore.setText("Score: "+myScore);}
+	        
+	    }
+	 private void checkSplitWinner1() {
+		 if 	 (player.value_split1() > 21)	{User.append("This hand busts" + "\n");}
+		 
+		 else 									User.append("\n");
+	 }
+	 
+	 private void checkSplitWinnerFinal() {
+		 if 	(player.value_split2() > 21) 		{User.append("This hand also busts" + "\n" + "You Lose " + myBet+ "\n" );
+		 											Computer.append("You bust\nYou Lose "+myBet+"\n");
+		 											myScore-=myBet;
+		 											showScore.setText("Score: "+myScore);}
+		 
+		 else if (dealer.value()  >  21)        	{User.append("Dealer busts\nYou Win "+myBet+"\n");
+													Computer.append("Dealer busts\nYou Win "+myBet+"\n");
+													myScore+=myBet;
+													showScore.setText("Score: "+myScore);} 
+		 else if (player.value_split1() == dealer.value() || player.value_split2() == dealer.value()) 
+		 											{User.append("Push\nNothing lost or won\n");
+		 											Computer.append("Push\nNothing lost or won\n");} 
+		 
+		 else if (player.value_split1() >  dealer.value() || player.value_split2() > dealer.value())   
+		 											{User.append("You Have the higher value\nYou Win "+myBet+"\n");
+		 											Computer.append("You Have the higher value\nYou Win "+myBet+"\n");
+		 											myScore+=myBet;
+		 											showScore.setText("Score: "+myScore);}
+		 else {User.append("Dealer has the higher value\nYou Lose "+myBet+"\n");
+			Computer.append("Dealer has the higher value\nYou Lose "+myBet+"\n");	
+			myScore-=myBet;
+			showScore.setText("Score: "+myScore);}
+ 
+		 }
+	 
+	private void openInstructions() {
+		InstructionsGUI igui = new InstructionsGUI(); 
+	}
+	 
+
+	 
+	// processes a button push
+	    public void actionPerformed(ActionEvent e) {
+	    	if (e.getSource() == start) {
+	    		start.setEnabled(false);
+	    		try{
+	    			myBet=Integer.parseInt(bet.getText());
+	    		} catch(Exception e1){
+	    			myBet=1;
+	    		}
+	    		round=1;
+	        	User.append("\nRound "+round+"\n");
+	        	Computer.append("\nRound "+round+"\n");
+	    		deal();
+
+	    		hit.setEnabled(true); 
+	    		stay.setEnabled(true); 
+	    		doubledown.setEnabled(true);
+	    		if (player.equal_value()==true) {split.setEnabled(true);}
+	    		else split.setEnabled(false); 
+	    		
+	    	}
+	    	
+	    	if (e.getSource() == inst) {
+	    		openInstructions(); 
+	    		
+	    	}
+	    	
+	    	if (e.getSource() == doubledown) {
+	    		myBet = myBet*2; 
+	    		doubledown.setEnabled(false); 
+	    		
+	    	}
+	    	
+	        if (e.getSource() == hit) {
+	        	doubledown.setEnabled(false);
+	        	if (hasSplit == true) {//hitting for splitting 
+	        		if (afterFirstHand == false) {
+	        			hit_split1(player);
+	        				if (player.value_split1() > 21) {
+	        					checkSplitWinner1();
+	        					second_hand();
+	        					start.setEnabled(false); 	
+	        				}
+	        		}
+	        		
+	        		if (afterFirstHand == true) {
+	        			hit_split2(player); 
+	        				if (player.value_split2() > 21) {
+	        					checkSplitWinnerFinal(); 
+	        					hit.setEnabled(false);
+	    	            		stay.setEnabled(false);
+	    	            		start.setEnabled(false); 
+	    	            		restart.setEnabled(true); 
+	    	            		split.setEnabled(false);
+	        				}
+	        		}
+	        	}	
+	        
+	        	else {//hitting for hand without splitting
+	        		hit_user(player);
+	            	if(player.value() > 21) {
+	            		checkWinner();
+	            		hit.setEnabled(false);
+	            		stay.setEnabled(false);
+	            		start.setEnabled(false); 
+	            		restart.setEnabled(true); 
+	            		split.setEnabled(false);
+
+	            	}
+	        	}
+	        	
+	       }
+
+	        if (e.getSource() == stay) {
+	        	doubledown.setEnabled(false);
+	        	if (hasSplit == true) {
+	        		if (afterFirstHand == false) {
+	        			checkSplitWinner1(); 
+	        			second_hand(); 
+	        			hit_split2(player); 
+	        		}
+	        		
+	        		if (afterFirstHand == true) {
+	        			while(dealer.value() < 17)
+	    	                hit_dealer(dealer); 
+	        			if (player.value_split2() > 21) {
+        					checkSplitWinnerFinal(); }
+	        				
+	        			
+	        		}
+	        	}
+	        	
+	        	else {while(dealer.value() < 17)
+	                hit_dealer(dealer);
+	            checkWinner();
+	            
+	        	}
+	        	
+	        	//hit.setEnabled(false);
+	            stay.setEnabled(false);
+	            start.setEnabled(false);
+	            restart.setEnabled(true); 
+	            split.setEnabled(false);
+	        }
+	        
+	        if (e.getSource() == split) {
+	        	hasSplit = true; 
+	        	split_player();	
+	        }
+
+	        if (e.getSource() == restart) {
+	        	hasSplit = false; 
+	        	afterFirstHand = false;
+	        	doubledown.setEnabled(true);
+	        	round++;
+	        	clearboard(); 
+	        	User.append("Round "+round+"\n");
+	        	Computer.append("Round "+round+"\n");
+	        	
+	        	deal(); 
+	        	if (player.equal_value()) {split.setEnabled(true);}
+	        	else split.setEnabled(false); 
+
+	        	//myScore--;
+	    		//showScore.setText("Score: "+myScore);
+	        	try{
+	    			myBet=Integer.parseInt(bet.getText());
+	    		} catch(Exception e1){
+	    			myBet=1;
+	    		}
+	            hit.setEnabled(true);
+	            stay.setEnabled(true);
+	            start.setEnabled(false);
+	           
+	        }
+	        
+	        if (e.getSource() == exit) {
+	            System.exit(0);
+	        }
+	        
+	    }
+	    public static void main (String [] args) {
+			Deck myDeck = new Deck(); 
+			myDeck.shuffle(); 
+			
+			BJGUI gui = new BJGUI(); 
+		}
+	 
+}
+	 
+
