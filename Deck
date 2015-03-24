@@ -1,0 +1,43 @@
+import java.util.Random;
+
+
+public class Deck {
+	private Card a[]=new Card[52];
+	private int placeHolder=0;
+	public Deck(){//creates deck with appropriate card. 
+		int j=0;
+		for(int i=0;i<13;i++){
+			a[j++]=new Card(i+1,"spade");
+			a[j++]=new Card(i+1,"heart");
+			a[j++]=new Card(i+1,"diamond");
+			a[j++]=new Card(i+1,"clubs");
+		}
+	}
+	public void shuffle(){
+	    Random randomGenerator = new Random();
+	    for(int j=0;j<3;j++)
+	    for(int b=0;b<52;b++){
+			int y = randomGenerator.nextInt(52);
+			Card tempCard = a[b];
+			a[y]=a[b];
+			a[b]=tempCard;
+		}	
+			
+	}
+	public Card deal(){//returns single card.
+		placeHolder++;
+		return a[placeHolder-1];
+	}
+	public Boolean empty(){//returns true if deck is empty
+		if(placeHolder==51)return true;
+		else return false;
+	}
+	public void show(){//prints out entire deck. i used it to test shuffle
+		for(int i=placeHolder;i<52;i++){
+			a[i].printCard();
+			System.out.print("; ");
+		}
+	}
+	
+
+}
