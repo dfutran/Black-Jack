@@ -1,0 +1,41 @@
+public class Card {
+	private int value;
+	private String type;
+	public Card(int x, String y){
+		value=x;
+		type=y;
+	}
+	public int getValue(){
+		return this.value;
+	}
+	public String getType(){
+		return this.type;
+	}
+	public void printCard(){
+		if(this.value==1) System.out.print("Ace of "+this.type);
+		else if(this.value==11) System.out.print("Jack of "+this.type);
+		else if(this.value==12) System.out.print("Queen of "+this.type);
+		else if(this.value==13) System.out.print("King of "+this.type);
+		else System.out.print(this.value+" of "+this.type);
+		
+	}
+	//blackJack:
+	public static String getFaceValue (Card c) {
+		String FaceValue = "";  
+		if (c.value == 11) {FaceValue = "Jack of " + c.type ;} 
+		else if (c.value == 12) {FaceValue = "Queen of " + c.type;}
+		else if (c.value == 13) {FaceValue = "King of " + c.type;} 
+		else if (c.value == 14) {FaceValue = "Ace of " + c.type;}
+		if (c.value < 11) FaceValue = String.valueOf(c.value) + " of " + c.type;
+		return FaceValue; 
+	}
+	public int getBJValue (Card c) {
+		int BJValue = 0; 
+		if (c.value== 11 || c.value == 12 || c.value == 13) {BJValue=10;}
+		else if (c.value == 14)  {BJValue = 1;}
+		else BJValue = c.value; 
+		return BJValue; 
+	}
+	
+	
+}
