@@ -1,0 +1,159 @@
+
+public class Player {
+//this class will have a hand, and a method to play a specific card, and a method to recieve a card
+	private Card a[]=new Card[30];
+	private int ph=0;
+	//blackjack:
+	private Card split1[] = new Card[30]; 
+	private Card split2[] = new Card[30]; 
+	private int playerHand=0;
+	private int playerHand1 = 0; 
+	private int playerHand2 = 0; 
+	
+	public Player(){}
+
+	public void recieveCard(Card b){//this method puts a card in the player's hand, but in order.tested and works
+		int x;
+		for(x=0;x<ph;x++){
+			if(b.getValue()<a[x].getValue()){
+				for(int i=29;i>x;i--){
+					a[i]=a[i-1];
+				}
+				
+				break;
+			}
+		}
+		a[x]=b;
+		ph++;
+		
+	}
+	public Card playCard(int x){//the user inputs a value, and we return the card with that value. else return the first card. note: fix later to give an exception
+	//for now, tested and works
+		for(int j=0;j<30;j++){
+				if(a[j].getValue()==x){
+					Card Temp = a[j];
+					for(int l=j;l<29;l++){
+						a[l]=a[l+1];
+					}
+					ph--;
+					return Temp;
+				}
+		}
+		return a[0];
+		
+	}
+	public Card playCard(){//returns the first card
+		Card Temp = a[0];
+		for(int l=0;l<29;l++){
+			a[l]=a[l+1];
+		}
+		ph--;
+		return Temp;
+	}
+	public Boolean hasCard(int x){//checks if card with value x has this
+		for(int j=0;j<ph;j++){
+			if(a[j].getValue()==x){
+				return true;
+			}
+	}
+	return false;
+	}
+	public int howManyCards(int x){//checks how many of a card with value x, player has. ex. 3 of cards with value 4
+		int temp=0;
+		for(int j=0;j<ph;j++){
+			if(a[j].getValue()==x){
+				temp++;
+			}
+		}
+		return temp;
+	}
+	public String convertHand(){//this method returns the hand as a string. tested works
+		String hand="";
+		for(int i=0;i<(ph);i++){
+			hand = hand + a[i].getValue()+",";
+		}
+		return hand;
+	}
+	//blackjack:
+	public void dealTo(Card c) { a[playerHand++] = c;    }    // insert card
+	public void split_Hand () {split1[playerHand1++] = a[0]; split2[playerHand2++] = a[1]; } 
+	public void dealToSplit1(Card c) {split1[playerHand1++] = c; } 
+	public void dealToSplit2(Card c) {split2[playerHand2++] = c; } 
+	
+	public void reset()        { playerHand = 0; playerHand1 = 0; playerHand2 = 0;}    // discard all cards
+	
+	public boolean equal_value() { //returns the first card's value for splitting 
+		boolean equal = false; 
+		if (a[0].getBJValue(a[0]) == a[1].getBJValue(a[1])) equal = true; 
+		return equal; 
+	}
+	
+	public String first_card() {
+		String first; 
+		return first = a[0].getFaceValue(split1[0]) + " " + a[0].getBJValue(split1[0]); 
+	}
+	
+	public String second_card() {
+		String second; 
+		return second = a[1].getFaceValue(a[1]) + " " + a[1].getBJValue(a[1]); 
+	}
+	
+	public int value() {
+        int val = 0;
+        boolean hasAce = false;
+        for (int i = 0; i < playerHand; i++) {
+            val = val + a[i].getBJValue(a[i]);
+            if (a[i].getBJValue(a[i])==1 ) hasAce = true;
+        }
+        if (hasAce && (val <= 11)) val = val + 10;          // handle ace = 1 or 11
+        return val;
+    }
+	
+	public int value_split1 () {
+		int val = 0;
+		boolean hasAce = false;
+        for (int i = 0; i < playerHand1; i++) {
+            val = val + split1[i].getBJValue(split1[i]);
+            if (split1[i].getBJValue(split1[i])==1 ) hasAce = true;
+        }
+        if (hasAce && (val <= 11)) val = val + 10;          // handle ace = 1 or 11
+        return val;
+	}
+	
+	public int value_split2 () {
+		int val = 0;
+		boolean hasAce = false;
+        for (int i = 0; i < playerHand2; i++) {
+            val = val + split2[i].getBJValue(split2[i]);
+            if (split2[i].getBJValue(split2[i])==1 ) hasAce = true;
+        }
+        if (hasAce && (val <= 11)) val = val + 10;          // handle ace = 1 or 11
+        return val;
+	}
+
+    //String of Entire Hand
+    public String toString() {
+    	String s = "";
+        for (int i = 0; i < playerHand; i++)
+            s += a[i].getFaceValue(a[i]) + " " + a[i].getBJValue(a[i]) + "\n"; 
+        return s;
+    }
+    
+    public String hitCard() { //String of Lastly Added Card to Hand	
+    	String lastCard = a[playerHand-1].getFaceValue(a[playerHand-1]) + a[playerHand-1].getBJValue(a[playerHand-1]) + "\n";
+    	return lastCard; 
+    }
+    
+    public String hitCardSplit1() {
+    	String lastCard = split1[playerHand1-1].getFaceValue(split1[playerHand1-1]) + split1[playerHand1-1].getBJValue(split1[playerHand1-1]) + "\n";
+    	return lastCard; 
+    }
+    
+    public String hitCardSplit2() {
+    	String lastCard = split2[playerHand2-1].getFaceValue(split2[playerHand2-1]) + split2[playerHand2-1].getBJValue(split2[playerHand2-1]) + "\n";
+    	return lastCard; 
+    }
+    
+
+
+}
